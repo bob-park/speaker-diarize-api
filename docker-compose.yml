@@ -1,0 +1,11 @@
+services:
+  speaker-diarize-api:
+    container_name: speaker-diarize-api
+    image: ghcr.io/bob-park/speaker-diarize-api
+    build:
+      dockerfile: ./Dockerfile
+      x-bake:
+        platforms:
+          - linux/amd64
+
+    

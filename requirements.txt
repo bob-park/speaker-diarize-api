@@ -1,0 +1,3 @@
+flask
+pyannote-audio
+sentencepiece
