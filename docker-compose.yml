@@ -1,7 +1,7 @@
 services:
   speaker-diarize-api:
     container_name: speaker-diarize-api
-    image: ghcr.io/bob-park/speaker-diarize-api
+    image: ghcr.io/bob-park/speaker-diarize-api:cuda
     build:
       dockerfile: ./Dockerfile
       x-bake:
