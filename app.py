@@ -8,7 +8,9 @@ app = Flask(__name__)
 
 pipeline = Pipeline.from_pretrained("pyannote/speaker-diarization",
                                     use_auth_token=os.environ["HUGGINGFACE_ACCESS_TOKEN"])
-pipeline.to(torch.device("cpu"))
+
+# pipeline.to(torch.device("cpu"))
+pipeline.to(torch.device("cuda"))
 
 @app.route("/diarize", methods=["POST"])
 def diarize():
