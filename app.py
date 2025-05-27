@@ -2,11 +2,13 @@ from flask import Flask, request, jsonify
 from pyannote.audio import Pipeline
 import os
 import tempfile
+import torch
 
 app = Flask(__name__)
 
 pipeline = Pipeline.from_pretrained("pyannote/speaker-diarization",
-                                    use_auth_token=os.environ["HUGGING_HUB_ACCESS_TOKEN"])
+                                    use_auth_token=os.environ["HUGGINGFACE_ACCESS_TOKEN"])
+pipeline.to(torch.device("gpu"))
 
 @app.route("/diarize", methods=["POST"])
 def diarize():
