@@ -17,14 +17,18 @@ def diarize():
     if 'file' not in request.files:
         return jsonify({"error": "No file provided"}), 400
 
+    if "numSpeakers" not in request.files:
+        return jsonify({"error": "No numSpeakers provided"}), 400
+
     audio_file = request.files['file']
+    num_speakers = request.numSpeakers;
 
     with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp:
         audio_path = tmp.name
         audio_file.save(audio_path)
 
     # diarization 수행
-    diarization = pipeline(audio_path)
+    diarization = pipeline(audio_path, num_speakers=num_speakers)
 
     results = []
     for turn, _, speaker in diarization.itertracks(yield_label=True):
