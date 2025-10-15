@@ -6,8 +6,8 @@ import torch
 
 app = Flask(__name__)
 
-pipeline = Pipeline.from_pretrained("pyannote/speaker-diarization-community-1",
-                                    token=os.environ["HUGGINGFACE_ACCESS_TOKEN"])
+pipeline = Pipeline.from_pretrained("pyannote/speaker-diarization-3.1",
+                                    use_auth_token=os.environ["HUGGINGFACE_ACCESS_TOKEN"])
 
 # pipeline.to(torch.device("cpu"))
 pipeline.to(torch.device("cuda"))
