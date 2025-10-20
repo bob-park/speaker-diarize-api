@@ -1,10 +1,13 @@
-from flask import Flask, request, jsonify
+from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi.responses import JSONResponse
 from pyannote.audio import Pipeline
 import os
 import tempfile
 import torch
+import uvicorn
 
-app = Flask(__name__)
+app = FastAPI()
+
 
 def getDevice():
     if torch.cuda.is_available():
@@ -13,6 +16,7 @@ def getDevice():
         return torch.device("mps")  # Apple Silicon GPU
     else:
         return torch.device("cpu")
+
 
 device = getDevice()
 
@@ -30,16 +34,16 @@ pipeline = Pipeline.from_pretrained("pyannote/speaker-diarization-3.1",
 
 pipeline.to(device)
 
-@app.route("/diarize", methods=["POST"])
-def diarize():
-    if 'file' not in request.files:
-        return jsonify({"error": "No file provided"}), 400
 
-    audio_file = request.files['file']
+@app.post("/diarize")
+async def diarize(file: UploadFile = File(...)):
+    if not file:
+        raise HTTPException(status_code=400, detail="No file provided")
 
     with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp:
         audio_path = tmp.name
-        audio_file.save(audio_path)
+        content = await file.read()
+        tmp.write(content)
 
     # diarization 수행
     diarization = pipeline(audio_path)
@@ -53,7 +57,8 @@ def diarize():
         })
 
     os.remove(audio_path)  # 임시 파일 정리
-    return jsonify(results)
+    return JSONResponse(content=results)
+
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5001)
+    uvicorn.run(app, host="0.0.0.0", port=5001)
