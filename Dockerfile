@@ -1,4 +1,4 @@
-FROM pytorch/pytorch:2.7.0-cuda12.6-cudnn9-runtime
+FROM python:3.11-slim
 
 ENV DEBIAN_FRONTEND=noninteractive
 WORKDIR /app
@@ -11,7 +11,9 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
-RUN pip install --upgrade pip && pip install -r requirements.txt
+RUN pip install --upgrade pip && \
+    pip install torch torchvision torchaudio && \
+    pip install -r requirements.txt
 
 COPY app.py .
 
