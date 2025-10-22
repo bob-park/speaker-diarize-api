@@ -1,7 +1,9 @@
+## base
 FROM pytorch/pytorch:2.7.0-cuda12.6-cudnn9-runtime
-
-ENV DEBIAN_FRONTEND=noninteractive
 WORKDIR /app
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PIP_NO_CACHE_DIR=1
+ENV PYTHONUNBUFFERED=1
 
 RUN apt-get update && apt-get install -y \
     ffmpeg \
@@ -15,8 +17,12 @@ COPY requirements.txt .
 RUN pip install --upgrade pip && \
     grep -v "^torch" requirements.txt | pip install --no-cache-dir -r /dev/stdin
 
-COPY app.py .
+COPY ./app .
 
-EXPOSE 5001
+EXPOSE 8000
 
-CMD ["python", "app.py"]
+# Health check
+HEALTHCHECK --interval=10s --timeout=10s --start-period=10s --retries=3 \
+    CMD curl --fail http://localhost:8000/health || exit 1
+
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
