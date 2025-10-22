@@ -12,8 +12,8 @@ RUN apt-get update && apt-get install -y \
 
 COPY requirements.txt .
 RUN pip install --upgrade pip && \
-    pip install torch torchvision torchaudio && \
-    pip install -r requirements.txt
+    pip install --no-cache-dir torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu && \
+    pip install --no-cache-dir -r requirements.txt
 
 COPY app.py .
 
