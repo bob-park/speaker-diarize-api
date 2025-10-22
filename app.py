@@ -19,6 +19,7 @@ def getDevice():
 
 
 device = getDevice()
+params = {"clustering": {"threshold": 0.8}}
 
 # 환경변수 확인 및 가져오기
 hf_token = os.environ.get("HUGGINGFACE_ACCESS_TOKEN")
