@@ -7,4 +7,3 @@ torchaudio==2.2.0
 torchvision==0.17.0
 pyannote-audio>=3.1.1
 sentencepiece==0.1.99
-faster_whisper
