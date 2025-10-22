@@ -5,30 +5,40 @@ import os
 import tempfile
 import torch
 import uvicorn
+import logging
+
+
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
 
 def getDevice():
     if torch.cuda.is_available():
+        logger.debug("CUDA device detected")
         return torch.device("cuda")
     elif torch.backends.mps.is_available():
+        logger.debug("MPS device detected (Apple Silicon)")
         return torch.device("mps")  # Apple Silicon GPU
     else:
+        logger.debug("Using CPU device")
         return torch.device("cpu")
 
 
 device = getDevice()
-params = {"clustering": {"threshold": 0.8}}
 
 # 환경변수 확인 및 가져오기
 hf_token = os.environ.get("HUGGINGFACE_ACCESS_TOKEN")
 if not hf_token:
-    print("⚠️  Warning: HUGGINGFACE_ACCESS_TOKEN not found in environment variables")
-    print(f"Available environment variables: {list(os.environ.keys())}")
+    logger.error("HUGGINGFACE_ACCESS_TOKEN not found in environment variables")
+    logger.debug(f"Available environment variables: {list(os.environ.keys())}")
     raise ValueError("HUGGINGFACE_ACCESS_TOKEN environment variable is required")
 
-print(f"✓ HuggingFace token loaded (length: {len(hf_token)})")
+logger.debug(f"HuggingFace token loaded (length: {len(hf_token)})")
 
 pipeline = Pipeline.from_pretrained("pyannote/speaker-diarization-3.1",
                                     use_auth_token=hf_token)
